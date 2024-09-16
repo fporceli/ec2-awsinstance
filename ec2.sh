@@ -65,6 +65,10 @@ escolher_opcao_seguranca() {
 			;;
 		2)
 			clear
+			ip_publico=$(curl https://checkip.amazonaws.com) 
+			read -p "Qual o id do grupo de segurança? " id_grupoc
+			aws ec2 authorize-security-group-ingress --group-id $id_grupoc --protocol tcp --port 22 --cidr $ip_publico/32
+			aws ec2 authorize-security-group-ingress --group-id $id_grupoc --protocol tcp --port 22-8000 --cidr 0.0.0.0/0
 			echo "Em construção..."
 			sleep 3
 			exibir_menu_gruposeguranca
@@ -72,8 +76,9 @@ escolher_opcao_seguranca() {
 			;;
 		3)
 			clear
-			echo "Em construção..."
-			sleep 3
+			read -p "Qual o nome do grupo que você deseja consultar? " nome_grupo
+			aws ec2 describe-security-groups --group-names $nome_grupo
+			sleep 10
 			exibir_menu_gruposeguranca
 			escolher_opcao_seguranca
 			;;
@@ -90,5 +95,3 @@ escolher_opcao_seguranca() {
 
 exibir_menu
 escolher_opcao
-
-
