@@ -35,7 +35,11 @@ exibir_menu_ami () {
 
 escolher_opcao() {
 	read -p "Escolha a opção [1-X]: " opcao
-	case $opcao in
+	if [ $opcao -lt 1 ] || [ $opcao -gt 4 ]; then
+		echo "Você não digitou um número entre 1 e 4"
+		escolher_opcao
+	else
+		case $opcao in
 		1)
 			sudo apt install awscli -y
 			versao_aws=$(aws --version)
@@ -61,7 +65,8 @@ escolher_opcao() {
                         escolher_opcao_ami
                         ;;
 
-	esac
+	esac	
+	fi
 }
 
 escolher_opcao_seguranca() {
@@ -75,9 +80,10 @@ escolher_opcao_seguranca() {
                         id_grupo=$(aws ec2 describe-security-groups --filters Name=group-name,Values="$nome_grupo_seguranca" --query 'SecurityGroups[0].GroupId' --output text)
 
                         echo -e "Grupo criado com sucesso!\nO Grupo $nome_grupo_seguranca foi criado com o id $id_grupo"
-			sleep 5
-			exibir_menu_gruposeguranca
-			escolher_opcao_seguranca
+			echo -e "\nPressione enter para sair"
+                        read
+                        exibir_menu_gruposeguranca
+                        escolher_opcao_seguranca
 			;;
 		2)
 			clear
@@ -85,31 +91,34 @@ escolher_opcao_seguranca() {
 			read -p "Qual o id do grupo de segurança? " id_grupoc
 			aws ec2 authorize-security-group-ingress --group-id $id_grupoc --protocol tcp --port 22 --cidr $ip_publico/32
 			aws ec2 authorize-security-group-ingress --group-id $id_grupoc --protocol tcp --port 22-8000 --cidr 0.0.0.0/0
-			echo "Em construção..."
-			sleep 3
-			exibir_menu_gruposeguranca
-			escolher_opcao_seguranca
+			echo -e "\nPressione enter para sair"
+                        read
+                        exibir_menu_gruposeguranca
+                        escolher_opcao_seguranca
 			;;
 		3)
 			clear
 			read -p "Qual o nome do grupo que você deseja consultar? " nome_grupo
 			aws ec2 describe-security-groups --group-names $nome_grupo
-			sleep 10
-			exibir_menu_gruposeguranca
-			escolher_opcao_seguranca
+			echo -e "\nPressione enter para sair"
+                        read
+                        exibir_menu_gruposeguranca
+                        escolher_opcao_seguranca
+
 			;;
 		4)
 			echo "Saindo..."
-			sleep 1
-			exibir_menu
-			escolher_opcao
+                        total=50
+                        for ((i=1; i<=total; i++)); do
+                                # Imprimir "=" sem quebrar a linha
+                                echo -n "="
+                                # Pausar por 0.1 segundos (ajuste o tempo conforme necessário)
+                                sleep 0.03
+                        done
+                        exibir_menu
+                        escolher_opcao
+			
 			;;
-		5)
-			exibir_menu_ami
-			escolher_opcao_ami
-			;;
-
-
 	esac
 }
 
@@ -123,36 +132,53 @@ escolher_opcao_ami () {
 			nome_consulta_ami_min=$(echo $nome_consulta_ami | tr '[:upper:]' '[:lower:]')
 			echo "Consultando imagens oficiais do Ubuntu com o nome: $nome_consulta_ami_min "
 			aws ec2 describe-images --filters "Name=name,Values=$nome_consulta_ami_min*" --owners 099720109477 --query 'Images[*].[ImageId,Name,Description]' --output table
+			echo -e "\nPressione enter para sair"
+                        read
+                        exibir_menu_ami
+                        escolher_opcao_ami
+
 			;;
-			2)
+		2)
 			clear
                         read -p "Digite o nome da AMI que deseja consultar: " nome_consulta_ami
                         nome_consulta_ami_min=$(echo $nome_consulta_ami | tr '[:upper:]' '[:lower:]')
                         echo "Consultando imagens oficiais do Debian com o nome: $nome_consulta_ami_min "
                         aws ec2 describe-images --filters "Name=name,Values=$nome_consulta_ami_min*" --owners 136693071363 --query 'Images[*].[ImageId,Name,Description]' --output table
+			echo -e "\nPressione enter para sair"
+                        read
+                        exibir_menu_ami
+                        escolher_opcao_ami
 			;;
-			 3)
+		3)
                         clear
                         read -p "Digite o nome da AMI que deseja consultar: " nome_consulta_ami
                         nome_consulta_ami_min=$(echo $nome_consulta_ami | tr '[:upper:]' '[:lower:]')
                         echo "Consultando imagens oficiais do CentOS com o nome: $nome_consulta_ami_min "
-                        aws ec2 describe-images --filters "Name=name,Values=$nome_consulta_ami_min*" --owners 125523088429 --query 'Images[*].[ImageId,Name,Description]' --output table
+                        aws ec2 describe-images --filters "Name=name,Values=\b$nome_consulta_ami_min*\b" --owners 125523088429 --query 'Images[*].[ImageId,Name,Description]' --output table
+			echo -e "\nPressione enter para sair"
+                        read
+                        exibir_menu_ami
+                        escolher_opcao_ami
 			;;
 		4)
 			cat officialimages.txt
-			echo "Pressione enter para sair"
+			echo -e "\nPressione enter para sair"
 			read
-			opcao_menu_ami
-			escolha
-
-
+			exibir_menu_ami
+			escolher_opcao_ami
 			;;
 
 		5)
 			echo "Saindo..."
-			sleep 1
-			exibir_menu_ami
-			escolher_opcao_ami
+			total=50
+			for ((i=1; i<=total; i++)); do
+  				# Imprimir "=" sem quebrar a linha
+  				echo -n "="
+  				# Pausar por 0.1 segundos (ajuste o tempo conforme necessário)
+  				sleep 0.03
+			done
+			exibir_menu
+			escolher_opcao
 
 
 	esac
