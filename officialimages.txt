@@ -1,0 +1,35 @@
+1. Almalinux
+   - ID da Conta: 829827820859
+
+2. Amazon Linux (Amazon)
+   - ID da Conta: 137112412989
+
+3. Bitnami
+   - ID da Conta: 379101102735
+
+4. Canonical (Ubuntu)
+   - ID da Conta: 099720109477
+
+5. CentOS
+   - ID da Conta: 125523088429
+
+6. Debian
+   - ID da Conta: 136693071363
+
+7. Fedora
+   - ID da Conta: 125523088429
+
+8. Microsoft (Windows)
+   - ID da Conta: 801119661308
+
+9. OpenSUSE
+   - ID da Conta: 013907871322
+
+10. Red Hat (RHEL)
+    - ID da Conta: 309956199498
+
+11. SUSE
+    - ID da Conta: 013907871322
+
+12. Windows Server (Microsoft)
+    - ID da Conta: 801119661308

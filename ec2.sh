@@ -8,7 +8,7 @@ exibir_menu() {
 	echo "|             MENU EC2 MAKER              |"
 	echo " -----------------------------------------"
 	echo -e "Seja bem vindo ao gerador de instâncias automático! Por favor, escolha a próxima ação a ser tomada baseada em suas necessidades. \nCaso tenha dúvidas, selecione a opção X para entrar em contato conosco!\n"
-	echo -e "[1] Instalar dependências e verificar versão\n[2] Realizar configuração e conexão de usuário AWS\n[3] Criar novo par de chaves\n[4] Criar grupo de segurança"
+	echo -e "[1] Instalar dependências e verificar versão\n[2] Realizar configuração e conexão de usuário AWS\n[3] Criar novo par de chaves\n[4] Menu grupo de segurança\n[5] Consultar AMIs"
 
 }
 
@@ -19,6 +19,17 @@ exibir_menu_gruposeguranca () {
         echo " -----------------------------------------"
         echo -e "Selecione a opção que deseja em relação aos grupos de segurança das instâncias EC2 da AWS"
         echo -e "[1] Criar novo grupo de segurança\n[2] Realizar configurações de Firewall\n[3] Consultar informações dos meus grupos\n[4] Voltar para o menu"
+
+}
+
+exibir_menu_ami () {
+
+	clear
+	echo " -----------------------------------------"
+        echo "|     MENU AMI DESCRIPTION EC2 MAKER      |"
+        echo " -----------------------------------------"
+        echo -e "Selecione as opções "
+        echo -e "[1] Consultar AMIs do Ubuntu\n[2] Consultar AMIs do Debian\n[3] Consultar AMIs do CentOS\n[4] Consultar IDS de contas oficiais\n[5] Sair do menu"
 
 }
 
@@ -45,6 +56,11 @@ escolher_opcao() {
 			exibir_menu_gruposeguranca
 			escolher_opcao_seguranca
 			;;
+		5)
+                        exibir_menu_ami
+                        escolher_opcao_ami
+                        ;;
+
 	esac
 }
 
@@ -88,9 +104,59 @@ escolher_opcao_seguranca() {
 			exibir_menu
 			escolher_opcao
 			;;
+		5)
+			exibir_menu_ami
+			escolher_opcao_ami
+			;;
 
 
 	esac
+}
+
+escolher_opcao_ami () {
+
+	read -p "Escolha uma opção[1-4]: " opcao_menu_ami
+	case $opcao_menu_ami in
+		1) 
+			clear
+			read -p "Digite o nome da AMI que deseja consultar: " nome_consulta_ami
+			nome_consulta_ami_min=$(echo $nome_consulta_ami | tr '[:upper:]' '[:lower:]')
+			echo "Consultando imagens oficiais do Ubuntu com o nome: $nome_consulta_ami_min "
+			aws ec2 describe-images --filters "Name=name,Values=$nome_consulta_ami_min*" --owners 099720109477 --query 'Images[*].[ImageId,Name,Description]' --output table
+			;;
+			2)
+			clear
+                        read -p "Digite o nome da AMI que deseja consultar: " nome_consulta_ami
+                        nome_consulta_ami_min=$(echo $nome_consulta_ami | tr '[:upper:]' '[:lower:]')
+                        echo "Consultando imagens oficiais do Debian com o nome: $nome_consulta_ami_min "
+                        aws ec2 describe-images --filters "Name=name,Values=$nome_consulta_ami_min*" --owners 136693071363 --query 'Images[*].[ImageId,Name,Description]' --output table
+			;;
+			 3)
+                        clear
+                        read -p "Digite o nome da AMI que deseja consultar: " nome_consulta_ami
+                        nome_consulta_ami_min=$(echo $nome_consulta_ami | tr '[:upper:]' '[:lower:]')
+                        echo "Consultando imagens oficiais do CentOS com o nome: $nome_consulta_ami_min "
+                        aws ec2 describe-images --filters "Name=name,Values=$nome_consulta_ami_min*" --owners 125523088429 --query 'Images[*].[ImageId,Name,Description]' --output table
+			;;
+		4)
+			cat officialimages.txt
+			echo "Pressione enter para sair"
+			read
+			opcao_menu_ami
+			escolha
+
+
+			;;
+
+		5)
+			echo "Saindo..."
+			sleep 1
+			exibir_menu_ami
+			escolher_opcao_ami
+
+
+	esac
+
 }
 
 exibir_menu
