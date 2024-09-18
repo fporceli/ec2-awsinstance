@@ -8,7 +8,7 @@ exibir_menu() {
 	echo "|             MENU EC2 MAKER              |"
 	echo " -----------------------------------------"
 	echo -e "Seja bem vindo ao gerador de instâncias automático! Por favor, escolha a próxima ação a ser tomada baseada em suas necessidades. \nCaso tenha dúvidas, selecione a opção X para entrar em contato conosco!\n"
-	echo -e "[1] Instalar dependências e verificar versão\n[2] Realizar configuração e conexão de usuário AWS\n[3] Criar novo par de chaves\n[4] Menu grupo de segurança\n[5] Consultar AMIs"
+	echo -e "[1] Instalar dependências e verificar versão\n[2] Realizar configuração e conexão de usuário AWS\n[3] Criar novo par de chaves\n[4] Menu grupo de segurança\n[5] Consultar AMIs\n[6] Gerar instância EC2\n[7] Deletar instância"
 
 }
 
@@ -44,16 +44,41 @@ exibir_menu_instancia () {
 	read -p "Digite o nome do par de chaves que será usado: " chave_instancia
 	read -p "Digite o nome do grupo de segurança que será usado: " grupo_instancia
 	echo "Criando sua instância EC2..."
-	ec2 run-instances --image-id ami_instancia --count $qtd_instancia --instance-type ec2 --key-name $chave_instancia --security-groups $grupo_instancia
-	echo -e"Instância EC2 criada com sucesso!!\nRedirecionando para o menu..."
-	data_atual=$(date +"%d/%m/%Y")
-	hora_atual=$(date +"%H:%M")
-	echo -e "$data_atual $hora_atual INFO EC2MAKER - Nova instância criada" >> log.log 
-	sleep 2
+	criacao_instancia=$(aws ec2 run-instances --image-id $ami_instancia --count $qtd_instancia --instance-type t2.micro --key-name $chave_instancia --security-groups $grupo_instancia)
+	id_instancia=$(echo "$criacao_instancia" | grep InstanceId | awk -F'"' '{print $4}')
+	echo -e "Instância EC2 com o id: $id_instancia criada com sucesso!!\nRedirecionando para o menu..."
+	if [ $? -eq 0 ]; then
+        	data_atual=$(date +"%d/%m/%Y")
+                hora_atual=$(date +"%H:%M")
+                echo -e "$data_atual $hora_atual INFO EC2MAKER Nova instância criada\nId: $ami_instancia\nQuantidade: $qtd_instancia\nChave: $chave_instancia\nGrupo de segurança: $grupo_instancia" >> log.log
+        	read -p "Dê um nome para sua instância: " nome_instancia
+		aws ec2 create-tags --resources $id_instancia --tags Key=Name,Value=$nome_instancia
+		echo "Nome atribuído com sucesso!"
+	else
+		data_atual=$(date +"%d/%m/%Y")
+                hora_atual=$(date +"%H:%M")
+		echo -e "$data_atual $hora_atual WARNING EC2MAKER Erro ao criar nova instancia" >> log.log
+	fi
+	echo -e "Pressione ENTER para voltar" 
+	read
 	exibir_menu
 	escolher_opcao
 
 }
+
+exibir_menu_del_instancia (){
+	clear
+        echo " -----------------------------------------"
+        echo "|             MENU EC2 MAKER              |"
+        echo " -----------------------------------------"
+	read -p "Digite o nome da instancia que deseja deletar: " instancia_del
+	aws ec2 terminate-instances --instance-ids $instancia_del
+	echo -e "Instância $instancia_del deletada com sucesso\nPressione ENTER para voltar ao menu!"
+	read
+	exibir_menu
+	escolher_opcao
+
+}  
 
 
 escolher_opcao() {
@@ -102,8 +127,8 @@ escolher_opcao() {
                         escolher_opcao_ami
                         ;;
 		6)
-			echo "Em construcao..."
-
+			
+			exibir_menu_instancia
 			;;
 
 	esac	
